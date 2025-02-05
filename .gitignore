@@ -1,3 +1,4 @@
 **/.env
+**/.terraform
 .idea/
-vault-init.json
+*.tfstate*

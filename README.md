@@ -1,28 +1,25 @@
-# docker-vault-stack
+# docker-vault-ldap
 
 ## Description
 This repository contains a docker compose stack with the following services:
-- grafana
-- loki
-- prometheus
-- promtail
-- vault enterprise with raft backend
+- openldap
+- phpLDAPadmin
+- Vault
 
 ## Pre-requisites
 Install `taskfile` and `jq` with the following command:
 ```shell
-  brew install go-task jq
+brew install go-task jq
+```
+Install `terraform`with the following command:
+```shell
+brew tap hashicorp/tap
+brew install hashicorp/tap/terraform
 ```
 
 Clone git repository:
 ```shell
-git clone https://github.com/nhsy-hcp/docker-vault-stack.git
-```
-
-Create a `.env` file in the root folder with the following content:
-```shell
-export VAULT_ADDR=http://127.0.0.1:8200
-export VAULT_LICENSE=INSERT_LICENSE_HERE
+git clone https://github.com/nhsy-hcp/docker-vault-ldap.git
 ```
 
 ## Usage
@@ -31,34 +28,16 @@ export VAULT_LICENSE=INSERT_LICENSE_HERE
 Launch the docker compose stack with the following command:
 ```bash
 task up
+task post-install
 ```
 
-Initialise vault and unseal.
+Export the environment variables with the following command:
 ```shell
-task init
-task unseal
-```
-
-Add the VAULT_TOKEN to the `.env` file and load.
-```shell
-source .env
+export VAULT_ADDR=http://localhost:8200
+export VAULT_TOKEN=root
 vault token lookup
 ```
 
-## Post initialisation
-```shell
-source .env
-task up unseal
-```
-
 Navigate to the following urls:
-- http://localhost:3000/ - Grafana
-- http://localhost:9090/ - Prometheus
+- https://localhost:6443 - PHPLDAPadmin
 - http://localhost:8200/ - Vault
-
-Execute vault benchmark to test the performance of the vault and generate vault metrics.
-(requires `vault-benchmark` cli tool)
-```shell
-vault namespace create vault-benchmark
-task benchmark
-```

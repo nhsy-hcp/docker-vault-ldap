@@ -1,26 +1,26 @@
 # https://taskfile.dev
 version: '3'
 
-dotenv:
-  - .env
+vars:
+  VAULT_ADDR: http://localhost:8200
+  VAULT_TOKEN: root
 
 tasks:
-  default:
+  all:
     cmds:
       - task: up
       - task: status
+      - task: post-install
 
   up:
     preconditions:
-      - test -f .env
       - test -f docker-compose.yml
     cmds:
       - docker compose up -d --pull=missing
       - sleep 5
       - |
-        echo "Grafana: http://localhost:3000"
-        echo "Prometheus: http://localhost:9090"
         echo "Vault: http://localhost:8200"
+        echo "PHPLDAPAdmin: https://localhost:6443"
     silent: true
 
   down:
@@ -31,17 +31,17 @@ tasks:
     cmds:
       - docker compose restart vault
 
+  rebuild:
+    cmds:
+      - task: clean
+      - task: all
+      - task: post-install
+      - ./scripts/10_vault_vars.sh
+
   status:
     cmds:
       - vault status
-
-  init:
-    cmds:
-      - ./scripts/00_vault_init.sh
-
-  unseal:
-    cmds:
-      - ./scripts/20_vault_unseal.sh
+    ignore_error: true
 
   backup:
     cmds:
@@ -51,26 +51,12 @@ tasks:
     aliases: ["clean"]
     cmds:
       - docker compose rm -sfv
-      - docker volume rm {{.STACK_NAME }}_grafana-data
-      - docker volume rm {{.STACK_NAME }}_loki-data
-      - docker volume rm {{.STACK_NAME }}_prometheus-data
-      - docker volume rm {{.STACK_NAME }}_promtail-data
-      - docker volume rm {{.STACK_NAME }}_vault-data
-      - docker volume rm {{.STACK_NAME }}_vault-logs
+      - rm terraform.tfstate || true
     ignore_error: true
     vars:
       STACK_NAME:
         sh: basename "`pwd`"
 
-  benchmark:
-    cmds:
-      - vault-benchmark run -config=./benchmark/config.hcl
-
-  metrics:
-      cmds:
-        - |
-          curl -s --header "X-Vault-Token: $VAULT_TOKEN" "$VAULT_ADDR/v1/sys/metrics?format=prometheus"
-          
   logs-vault:
     cmds:
       - docker compose logs -f vault
@@ -86,3 +72,35 @@ tasks:
     cmds:
       - open http://localhost:8200
       - ./scripts/10_vault_vars.sh
+      - open https://localhost:6443
+      - |
+        echo "PHPLDAPAdmin: https://localhost:6443"
+        echo "bind dn: cn=admin,dc=example,dc=com"
+
+  ldap1-config:
+    cmds:
+      - docker cp ./files/ldap-example.ldif {{ .STACK_NAME }}_ldap:/tmp/ldap-example.ldif
+      - docker compose exec ldap /bin/bash -c 'ldapadd -cx -D "cn=admin,dc=example,dc=com" -w admin -f /tmp/ldap-example.ldif'|| true
+    vars:
+      STACK_NAME:
+        sh: basename "`pwd`"
+
+  ldap2-config:
+    cmds:
+      - docker cp ./files/ldap2-example.ldif {{ .STACK_NAME }}_ldap2:/tmp/ldap2-example.ldif
+      - docker compose exec ldap2 /bin/bash -c 'ldapadd -cx -D "cn=admin,dc=example2,dc=com" -w admin -f /tmp/ldap2-example.ldif'|| true
+    vars:
+      STACK_NAME:
+        sh: basename "`pwd`"
+
+  ldap-vault:
+    cmds:
+      - ./scripts/20_vault_ldap.sh
+
+  post-install:
+    cmds:
+      - terraform init
+      - terraform apply -auto-approve
+#      - task: ldap1-config
+#      - task: ldap2-config
+#      - task: ldap-vault
