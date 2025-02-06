@@ -1,7 +1,7 @@
 # https://taskfile.dev
 version: '3'
 
-vars:
+env:
   VAULT_ADDR: http://localhost:8200
   VAULT_TOKEN: root
 
@@ -15,6 +15,7 @@ tasks:
   up:
     preconditions:
       - test -f docker-compose.yml
+      - docker info
     cmds:
       - docker compose up -d --pull=missing
       - sleep 5
@@ -100,6 +101,7 @@ tasks:
   post-install:
     cmds:
       - terraform init
+#      - until $(terraform apply -auto-approve); do sleep 5; done
       - terraform apply -auto-approve
 #      - task: ldap1-config
 #      - task: ldap2-config
