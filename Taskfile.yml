@@ -36,7 +36,6 @@ tasks:
     cmds:
       - task: clean
       - task: all
-      - task: post-install
       - ./scripts/10_vault_vars.sh
 
   status:
@@ -101,8 +100,7 @@ tasks:
   post-install:
     cmds:
       - terraform init
-#      - until $(terraform apply -auto-approve); do sleep 5; done
       - terraform apply -auto-approve
-#      - task: ldap1-config
-#      - task: ldap2-config
+      - task: ldap1-config
+      - task: ldap2-config
 #      - task: ldap-vault
