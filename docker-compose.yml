@@ -1,12 +1,13 @@
 services:
   vault:
-    image: hashicorp/vault:1.18
+    image: hashicorp/vault:${VAULT_VERSION:-1.19}
     container_name: ${COMPOSE_PROJECT_NAME}_vault
     restart: no
     ports:
       - "8200:8200"
-    env_file:
-      - .env # Contains VAULT_ADDR, VAULT_LICENSE
+    environment:
+      VAULT_ADDR: "http://localhost:8200"
+      VAULT_TOKEN: "root"
     cap_add:
       - IPC_LOCK
     command: server -dev -dev-root-token-id=root
@@ -30,13 +31,13 @@ services:
     ports:
       - "6443:443"
 
-  ldap2:
-    image: osixia/openldap:1.5.0
-    container_name: ${COMPOSE_PROJECT_NAME}_ldap2
-    environment:
-      LDAP_ORGANISATION: "Example 2 Inc."
-      LDAP_DOMAIN: "example2.com"
-      LDAP_ADMIN_PASSWORD: "admin"
+#  ldap2:
+#    image: osixia/openldap:1.5.0
+#    container_name: ${COMPOSE_PROJECT_NAME}_ldap2
+#    environment:
+#      LDAP_ORGANISATION: "Example 2 Inc."
+#      LDAP_DOMAIN: "example2.com"
+#      LDAP_ADMIN_PASSWORD: "admin"
 
 networks:
   default:

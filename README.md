@@ -27,8 +27,7 @@ git clone https://github.com/nhsy-hcp/docker-vault-ldap.git
 
 Launch the docker compose stack with the following command:
 ```bash
-task up
-task post-install
+task all
 ```
 
 Export the environment variables with the following command:
@@ -41,3 +40,14 @@ vault token lookup
 Navigate to the following urls:
 - https://localhost:6443 - PHPLDAPadmin
 - http://localhost:8200/ - Vault
+
+## LDAP user testing
+```shell
+LDAP_BOB=$(vault login -method=ldap -field=token username=bob password=password)
+VAULT_TOKEN=$LDAP_BOB vault kv get secret/restricted/db
+```
+
+```shell
+LDAP_ALICE=$(vault login -method=ldap -field=token username=alice password=password)
+VAULT_TOKEN=LDAP_ALICE vault kv get secret/restricted/db
+```

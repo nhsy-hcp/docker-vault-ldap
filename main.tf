@@ -23,8 +23,8 @@ resource "vault_audit" "stdout" {
 }
 
 # Enable and configure LDAP authentication backend 1
-resource "vault_ldap_auth_backend" "ldap1" {
-  path          = "ldap1"
+resource "vault_ldap_auth_backend" "ldap" {
+  path          = "ldap"
   url           = "ldap://ldap:389"
   userdn        = "ou=users,dc=example,dc=com"
   userattr      = "cn"
@@ -33,25 +33,9 @@ resource "vault_ldap_auth_backend" "ldap1" {
   groupattr     = "cn"
   binddn        = "cn=admin,dc=example,dc=com"
   bindpass      = "admin"
-  token_ttl     = 60
+  token_ttl     = 60 * 10
   token_max_ttl = 60 * 60 * 24
 }
-
-# Enable and configure LDAP authentication backend 2
-resource "vault_ldap_auth_backend" "ldap2" {
-  path          = "ldap2"
-  url           = "ldap://ldap2:389"
-  userdn        = "ou=users,dc=example2,dc=com"
-  userattr      = "cn"
-  groupdn       = "ou=groups,dc=example2,dc=com"
-  groupfilter   = "(|(memberUid={{.Username}})(member={{.UserDN}}))"
-  groupattr     = "cn"
-  binddn        = "cn=admin,dc=example2,dc=com"
-  bindpass      = "admin"
-  token_ttl     = 60 * 60
-  token_max_ttl = 60 * 60 * 24
-}
-
 
 # Create Vault policies
 resource "vault_policy" "vault_admins" {
@@ -64,47 +48,30 @@ resource "vault_policy" "app_secrets" {
   policy = file("./files/app-secrets.hcl")
 }
 
-# Create external groups and aliases for LDAP 1
-resource "vault_identity_group" "ldap1_vault_admins" {
-  name     = "ldap1-vault-admins"
+# Create external groups and aliases for LDAP
+resource "vault_identity_group" "ldap_vault_admins" {
+  name     = "ldap-vault-admins"
   type     = "external"
   policies = [vault_policy.vault_admins.name]
 }
 
 resource "vault_identity_group_alias" "ldap1_vault_admins_alias" {
   name           = "vault-admins"
-  canonical_id   = vault_identity_group.ldap1_vault_admins.id
-  mount_accessor = vault_ldap_auth_backend.ldap1.accessor
+  canonical_id   = vault_identity_group.ldap_vault_admins.id
+  mount_accessor = vault_ldap_auth_backend.ldap.accessor
 }
 
-resource "vault_identity_group" "ldap1_developers" {
-  name     = "ldap1-developers"
+resource "vault_identity_group" "ldap_developers" {
+  name     = "ldap-developers"
   type     = "external"
   policies = [vault_policy.app_secrets.name]
 }
 
-resource "vault_identity_group_alias" "ldap1_developers_alias" {
+resource "vault_identity_group_alias" "ldap_developers_alias" {
   name           = "developers"
-  canonical_id   = vault_identity_group.ldap1_developers.id
-  mount_accessor = vault_ldap_auth_backend.ldap1.accessor
+  canonical_id   = vault_identity_group.ldap_developers.id
+  mount_accessor = vault_ldap_auth_backend.ldap.accessor
 }
-
-
-# Create external groups and aliases for LDAP 2 (similar structure)
-
-resource "vault_identity_group" "ldap2_vault_admins" {
-  name     = "ldap2-vault-admins"
-  type     = "external"
-  policies = [vault_policy.vault_admins.name]
-}
-
-resource "vault_identity_group_alias" "ldap2_vault_admins_alias" {
-  name           = "vault-admins"
-  canonical_id   = vault_identity_group.ldap2_vault_admins.id
-  mount_accessor = vault_ldap_auth_backend.ldap2.accessor
-}
-
-
 
 # Create entity and aliases
 resource "vault_identity_entity" "ldap_bob" {
@@ -115,18 +82,11 @@ resource "vault_identity_entity" "ldap_bob" {
   }
 }
 
-resource "vault_identity_entity_alias" "ldap_bob_alias_ldap1" {
+resource "vault_identity_entity_alias" "ldap_bob_alias_ldap" {
   name           = "bob"
   canonical_id   = vault_identity_entity.ldap_bob.id
-  mount_accessor = vault_ldap_auth_backend.ldap1.accessor
+  mount_accessor = vault_ldap_auth_backend.ldap.accessor
 }
-
-resource "vault_identity_entity_alias" "ldap_bob_alias_ldap2" {
-  name           = "bob"
-  canonical_id   = vault_identity_entity.ldap_bob.id
-  mount_accessor = vault_ldap_auth_backend.ldap2.accessor
-}
-
 
 # Write KV secrets
 resource "vault_kv_secret_v2" "app_db" {
@@ -137,7 +97,6 @@ resource "vault_kv_secret_v2" "app_db" {
     password = "w1bble"
   })
 }
-
 resource "vault_kv_secret_v2" "restricted_db" {
   mount = "secret" # Default mount path for KV v2
   name  = "restricted/db"

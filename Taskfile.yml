@@ -77,18 +77,10 @@ tasks:
         echo "PHPLDAPAdmin: https://localhost:6443"
         echo "bind dn: cn=admin,dc=example,dc=com"
 
-  ldap1-config:
+  ldap-config:
     cmds:
       - docker cp ./files/ldap-example.ldif {{ .STACK_NAME }}_ldap:/tmp/ldap-example.ldif
       - docker compose exec ldap /bin/bash -c 'ldapadd -cx -D "cn=admin,dc=example,dc=com" -w admin -f /tmp/ldap-example.ldif'|| true
-    vars:
-      STACK_NAME:
-        sh: basename "`pwd`"
-
-  ldap2-config:
-    cmds:
-      - docker cp ./files/ldap2-example.ldif {{ .STACK_NAME }}_ldap2:/tmp/ldap2-example.ldif
-      - docker compose exec ldap2 /bin/bash -c 'ldapadd -cx -D "cn=admin,dc=example2,dc=com" -w admin -f /tmp/ldap2-example.ldif'|| true
     vars:
       STACK_NAME:
         sh: basename "`pwd`"
@@ -101,6 +93,4 @@ tasks:
     cmds:
       - terraform init
       - terraform apply -auto-approve
-      - task: ldap1-config
-      - task: ldap2-config
-#      - task: ldap-vault
+      - task: ldap-config
