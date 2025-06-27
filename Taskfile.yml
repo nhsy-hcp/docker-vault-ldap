@@ -10,7 +10,9 @@ tasks:
     cmds:
       - task: up
       - task: status
+      - sleep 5
       - task: post-install
+      - task: ui
 
   up:
     preconditions:
@@ -35,8 +37,9 @@ tasks:
   rebuild:
     cmds:
       - task: clean
+      - sleep 5
       - task: all
-      - ./scripts/10_vault_vars.sh
+#      - ./scripts/10_vault_vars.sh
 
   status:
     cmds:
@@ -72,7 +75,7 @@ tasks:
     cmds:
       - open http://localhost:8200
       - ./scripts/10_vault_vars.sh
-      - open https://localhost:6443
+#      - open https://localhost:6443
       - |
         echo "PHPLDAPAdmin: https://localhost:6443"
         echo "bind dn: cn=admin,dc=example,dc=com"
@@ -94,3 +97,13 @@ tasks:
       - terraform init
       - terraform apply -auto-approve
       - task: ldap-config
+
+  test:
+    cmds:
+      - task: clean
+      - sleep 5
+      - task: up
+      - task: status
+      - sleep 5
+      - task: post-install
+      - terraform test

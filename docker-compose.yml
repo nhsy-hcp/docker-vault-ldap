@@ -1,6 +1,6 @@
 services:
   vault:
-    image: hashicorp/vault:${VAULT_VERSION:-1.19}
+    image: hashicorp/vault:${VAULT_VERSION:-1.20}
     container_name: ${COMPOSE_PROJECT_NAME}_vault
     restart: no
     ports:
