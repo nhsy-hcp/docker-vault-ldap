@@ -69,9 +69,6 @@ task stop
 
 # Clean up and rebuild
 task clean all
-
-# Backup Vault data
-task backup
 ```
 
 ## Testing LDAP Authentication
@@ -91,7 +88,7 @@ VAULT_TOKEN=$LDAP_BOB vault kv get secret/app/db
 ### Test developers group access (Alice)
 ```shell
 # Login as Alice (member of developers group)
-LDAP_ALICE=$(vault login -method=ldap -field=token username=alice password=password)
+LDAP_ALICE=$(vault login -method=ldap -path=ldap1 -field=token username=alice password=password)
 
 # Alice can access app secrets
 VAULT_TOKEN=$LDAP_ALICE vault kv get secret/app/db
@@ -103,10 +100,10 @@ VAULT_TOKEN=$LDAP_ALICE vault kv get secret/restricted/db
 ### Test multiple LDAP backends
 ```shell
 # Test ldap1 backend
-vault login -method=ldap1 username=bob password=password
+vault login -method=ldap -path=ldap2 username=bob password=password
 
 # Test ldap2 backend
-vault login -method=ldap2 username=bob password=password
+vault login -method=ldap -path=ldap2 username=bob password=password
 ```
 
 ## Architecture Overview
@@ -118,6 +115,8 @@ The stack demonstrates:
 - **Policy-Based Access:** 
   - `vault-admins` policy: Full access to secrets and Vault administration
   - `app-secrets` policy: Limited access to application secrets only
+
+> **Note:** External groups can have one (and only one) alias. For more details, see the [Vault Identity documentation](https://developer.hashicorp.com/vault/docs/concepts/identity).
 
 ## Terraform Testing
 
@@ -179,3 +178,7 @@ See `tests/README.md` for detailed testing documentation.
 - **LDAP authentication fails:** Verify LDAP container is running and user data is loaded
 - **Terraform errors:** Ensure Vault is running and accessible before applying Terraform configuration
 - **Test failures:** Check test prerequisites and verify services are running with `task status`
+
+## Additional Resources
+- [Vault LDAP authentication documentation](https://developer.hashicorp.com/vault/docs/auth/ldap)
+- [Vault Identity documentation](https://developer.hashicorp.com/vault/docs/concepts/identity)

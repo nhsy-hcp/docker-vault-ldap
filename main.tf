@@ -1,13 +1,3 @@
-# Configure the Vault provider
-terraform {
-  required_providers {
-    vault = {
-      source  = "hashicorp/vault"
-      version = "~> 5.0"
-    }
-  }
-}
-
 provider "vault" {
   # address = "http://localhost:8200" # VAULT_ADDR
   # token   = "root"                  # VAULT_TOKEN
