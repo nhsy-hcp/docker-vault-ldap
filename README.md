@@ -163,11 +163,24 @@ terraform test -filter=tests/multi_backend_integration.tftest.hcl
 
 1. **Terraform 1.6.0+** - Required for native testing framework
 2. **Running services:** Use `task all` to start Vault and LDAP
-3. **Environment variables:**
+3. **Clean environment:** For integration tests, ensure no existing Vault resources conflict
+4. **Environment variables:**
    ```bash
    export VAULT_ADDR=http://localhost:8200
    export VAULT_TOKEN=root
    ```
+
+### Known Test Issues
+
+**Resource conflicts:** Integration tests may fail if previous test resources exist in Vault. Common errors include:
+- "path already in use at ldap1/" - LDAP auth backends already mounted
+- "group already exists" - Identity groups from previous runs
+- "audit backend: path already in use" - Audit logging already configured
+
+**Solutions:**
+- Restart Vault container: `task clean up` or `docker-compose restart vault`
+- Use terraform destroy: `terraform destroy -auto-approve` (if applicable)
+- Run unit tests only for configuration validation without resource creation
 
 See `tests/README.md` for detailed testing documentation.
 

@@ -105,5 +105,5 @@ tasks:
       - task: up
       - task: status
       - sleep 5
-      - task: post-install
+#      - task: post-install
       - terraform test
