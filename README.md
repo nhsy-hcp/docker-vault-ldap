@@ -13,6 +13,8 @@ This repository demonstrates HashiCorp Vault LDAP authentication integration usi
 - Group-based policy assignment (vault-admins, developers)
 - KV secrets engine with tiered access control
 - Sample users: `bob` (vault-admins group), `alice` (developers group)
+- LDAP secret engine configured with static role for `alice` (does not auto-rotate)
+- LDAP secret engine configured with dynamic role for a person in `developers` group
 
 ## Pre-requisites
 Install `taskfile` and `jq` with the following command:
@@ -104,6 +106,11 @@ vault login -method=ldap -path=ldap2 username=bob password=password
 
 # Test ldap2 backend
 vault login -method=ldap -path=ldap2 username=bob password=password
+```
+
+### Test LDAP secret engine dynamic role
+```shell
+vault read ldap/creds/developer 
 ```
 
 ## Architecture Overview
