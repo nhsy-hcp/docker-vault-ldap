@@ -1,5 +1,7 @@
 # Vault LDAP Integration Demo
 
+[![CI](https://github.com/nhsy-hcp/docker-vault-ldap/actions/workflows/ci.yml/badge.svg)](https://github.com/nhsy-hcp/docker-vault-ldap/actions/workflows/ci.yml)
+
 ## Description
 This repository demonstrates HashiCorp Vault LDAP authentication integration using Docker Compose. The stack includes:
 - **HashiCorp Vault** - Secrets management server (development mode)

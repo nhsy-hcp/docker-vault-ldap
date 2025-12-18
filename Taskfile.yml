@@ -12,7 +12,6 @@ tasks:
       - task: status
       - sleep 5
       - task: post-install
-      - task: ui
 
   up:
     preconditions:
@@ -103,7 +102,5 @@ tasks:
       - task: clean
       - sleep 5
       - task: up
-      - task: status
       - sleep 5
-#      - task: post-install
       - terraform test
