@@ -2,3 +2,4 @@
 **/.terraform
 .idea/
 *.tfstate*
+.terraform.lock.hcl
