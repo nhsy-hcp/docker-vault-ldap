@@ -8,29 +8,60 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      VAULT_ADDR: http://localhost:8200
+      VAULT_TOKEN: root
+
     steps:
       - name: checkout code
         uses: actions/checkout@v4
+
+      - name: setup docker buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: install vault
+        run: |
+          VAULT_VERSION=$(curl -s https://api.releases.hashicorp.com/v1/releases/vault/latest | jq -r '.version')
+          echo "Installing Vault ${VAULT_VERSION}"
+          curl -sLo vault.zip "https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip"
+          unzip vault.zip
+          sudo mv vault /usr/local/bin/
+          vault version
 
       - name: setup terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: "1.14.2"
 
-      - name: setup task
-        uses: arduino/setup-task@v2
-        with:
-          version: 3.x
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: setup docker buildx
-        uses: docker/setup-buildx-action@v3
-
       - name: terraform linting
         run: terraform fmt -check -recursive
 
-      - name: task all
-        run: task all
-        env:
-          VAULT_ADDR: http://localhost:8200
-          VAULT_TOKEN: root
+      - name: start services
+        run: |
+          docker compose up -d
+          docker compose ps
+          sleep 10
+
+      - name: check vault status
+        run: vault status
+
+      - name: terraform apply
+        run: |
+          terraform init
+          terraform apply -auto-approve
+          sleep 30
+
+      - name: configure ldap data
+        run: |
+          docker compose cp ./files/ldap-example.ldif ldap:/tmp/ldap-example.ldif
+          docker compose exec -T ldap ldapadd -cx -D "cn=admin,dc=example,dc=com" -w admin -f /tmp/ldap-example.ldif || true
+
+      - name: run tests
+        run: |
+          echo "fetching dynamic creds for developer role"
+          vault read ldap/creds/developer
+          echo "current creds for static role"
+          vault read ldap/static-cred/alice
+          vault write -f ldap/rotate-role/alice
+          echo "alice credentials rotated successfully"
+          vault read ldap/static-cred/alice

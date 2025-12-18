@@ -138,11 +138,11 @@ member: cn={{.Username}},ou=users,dc=example,dc=com
 -
 EOT
   deletion_ldif     = <<EOT
-dn: cn={{.Username}},ou=users,dc=learn,dc=example
+dn: cn={{.Username}},ou=users,dc=example,dc=com
 changetype: delete
 EOT
   rollback_ldif     = <<EOT
-dn: cn={{.Username}},ou=users,dc=learn,dc=example
+dn: cn={{.Username}},ou=users,dc=example,dc=com
 changetype: delete
 EOT
 }

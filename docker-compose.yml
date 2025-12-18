@@ -11,6 +11,11 @@ services:
     cap_add:
       - IPC_LOCK
     command: server -dev -dev-root-token-id=root
+    healthcheck:
+      test: ["CMD", "vault", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   ldap:
     image: osixia/openldap:1.5.0
