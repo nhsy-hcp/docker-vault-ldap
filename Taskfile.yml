@@ -87,15 +87,23 @@ tasks:
       STACK_NAME:
         sh: basename "`pwd`"
 
-  ldap-vault:
-    cmds:
-      - ./scripts/20_vault_ldap.sh
-
   post-install:
     cmds:
       - terraform init
       - terraform apply -auto-approve
       - task: ldap-config
+
+  rotate-alice:
+    desc: rotate alice ldap credentials via static role
+    cmds:
+      - vault write -f ldap/rotate-role/alice
+      - echo "alice credentials rotated successfully"
+      - vault read ldap/static-cred/alice
+
+  dynamic-creds:
+    desc: fetch dynamic ldap developer credentials
+    cmds:
+      - vault read ldap/creds/developer
 
   test:
     cmds:

@@ -12,48 +12,23 @@ run "validate_identity_groups_config" {
   command = plan
 
   assert {
-    condition     = vault_identity_group.ldap1_vault_admins.name == "ldap1-vault-admins"
-    error_message = "LDAP1 vault-admins group name should be 'ldap1-vault-admins'"
+    condition     = vault_identity_group.vault_admins.name == "vault-admins"
+    error_message = "vault-admins group name should be 'vault-admins'"
   }
 
   assert {
-    condition     = vault_identity_group.ldap1_vault_admins.type == "external"
-    error_message = "LDAP1 vault-admins group should be external type"
+    condition     = vault_identity_group.vault_admins.type == "external"
+    error_message = "vault-admins group should be external type"
   }
 
   assert {
-    condition     = vault_identity_group.ldap2_vault_admins.name == "ldap2-vault-admins"
-    error_message = "LDAP2 vault-admins group name should be 'ldap2-vault-admins'"
+    condition     = vault_identity_group.developers.name == "developers"
+    error_message = "developers group name should be 'developers'"
   }
 
   assert {
-    condition     = vault_identity_group.ldap2_vault_admins.type == "external"
-    error_message = "LDAP2 vault-admins group should be external type"
-  }
-}
-
-# Test developers groups configuration
-run "validate_developers_groups_config" {
-  command = plan
-
-  assert {
-    condition     = vault_identity_group.ldap1_developers.name == "ldap1-developers"
-    error_message = "LDAP1 developers group name should be 'ldap1-developers'"
-  }
-
-  assert {
-    condition     = vault_identity_group.ldap1_developers.type == "external"
-    error_message = "LDAP1 developers group should be external type"
-  }
-
-  assert {
-    condition     = vault_identity_group.ldap2_developers.name == "ldap2-developers"
-    error_message = "LDAP2 developers group name should be 'ldap2-developers'"
-  }
-
-  assert {
-    condition     = vault_identity_group.ldap2_developers.type == "external"
-    error_message = "LDAP2 developers group should be external type"
+    condition     = vault_identity_group.developers.type == "external"
+    error_message = "developers group should be external type"
   }
 }
 
@@ -62,23 +37,13 @@ run "validate_group_aliases_config" {
   command = plan
 
   assert {
-    condition     = vault_identity_group_alias.ldap1_vault_admins_alias.name == "vault-admins"
-    error_message = "LDAP1 vault-admins alias name should be 'vault-admins'"
+    condition     = vault_identity_group_alias.vault_admins_alias.name == "vault-admins"
+    error_message = "vault-admins alias name should be 'vault-admins'"
   }
 
   assert {
-    condition     = vault_identity_group_alias.ldap2_vault_admins_alias.name == "vault-admins"
-    error_message = "LDAP2 vault-admins alias name should be 'vault-admins'"
-  }
-
-  assert {
-    condition     = vault_identity_group_alias.ldap1_developers_alias.name == "developers"
-    error_message = "LDAP1 developers alias name should be 'developers'"
-  }
-
-  assert {
-    condition     = vault_identity_group_alias.ldap2_developers_alias.name == "developers"
-    error_message = "LDAP2 developers alias name should be 'developers'"
+    condition     = vault_identity_group_alias.developers_alias.name == "developers"
+    error_message = "developers alias name should be 'developers'"
   }
 }
 
@@ -102,17 +67,12 @@ run "validate_bob_entity_config" {
   }
 }
 
-# Test Bob's entity aliases configuration
-run "validate_bob_aliases_config" {
+# Test Bob's entity alias configuration
+run "validate_bob_alias_config" {
   command = plan
 
   assert {
-    condition     = vault_identity_entity_alias.ldap1_bob.name == var.expected_bob_entity_name
-    error_message = "Bob's LDAP1 alias name should be 'bob'"
-  }
-
-  assert {
-    condition     = vault_identity_entity_alias.ldap2_bob.name == var.expected_bob_entity_name
-    error_message = "Bob's LDAP2 alias name should be 'bob'"
+    condition     = vault_identity_entity_alias.bob.name == var.expected_bob_entity_name
+    error_message = "Bob's alias name should be 'bob'"
   }
 }

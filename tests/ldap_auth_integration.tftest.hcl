@@ -13,12 +13,12 @@ run "deploy_vault_ldap_infrastructure" {
   command = apply
 
   assert {
-    condition     = vault_ldap_auth_backend.ldap1.id != ""
+    condition     = vault_ldap_auth_backend.ldap.id != ""
     error_message = "LDAP1 backend should be successfully created"
   }
 
   assert {
-    condition     = vault_ldap_auth_backend.ldap2.id != ""
+    condition     = vault_ldap_auth_backend.ldap.id != ""
     error_message = "LDAP2 backend should be successfully created"
   }
 
@@ -43,12 +43,12 @@ run "test_ldap1_backend_config" {
   command = apply
 
   assert {
-    condition     = vault_ldap_auth_backend.ldap1.accessor != ""
+    condition     = vault_ldap_auth_backend.ldap.accessor != ""
     error_message = "LDAP1 backend should have a valid accessor"
   }
 
   assert {
-    condition     = vault_ldap_auth_backend.ldap1.path == "ldap1"
+    condition     = vault_ldap_auth_backend.ldap.path == "ldap"
     error_message = "LDAP1 backend should be mounted at 'ldap1' path"
   }
 }
@@ -58,12 +58,12 @@ run "test_ldap2_backend_config" {
   command = apply
 
   assert {
-    condition     = vault_ldap_auth_backend.ldap2.accessor != ""
+    condition     = vault_ldap_auth_backend.ldap.accessor != ""
     error_message = "LDAP2 backend should have a valid accessor"
   }
 
   assert {
-    condition     = vault_ldap_auth_backend.ldap2.path == "ldap2"
+    condition     = vault_ldap_auth_backend.ldap.path == "ldap"
     error_message = "LDAP2 backend should be mounted at 'ldap2' path"
   }
 }
@@ -73,22 +73,22 @@ run "test_group_mappings_created" {
   command = apply
 
   assert {
-    condition     = vault_identity_group.ldap1_vault_admins.id != ""
+    condition     = vault_identity_group.vault_admins.id != ""
     error_message = "LDAP1 vault-admins group should be created"
   }
 
   assert {
-    condition     = vault_identity_group.ldap2_vault_admins.id != ""
+    condition     = vault_identity_group.vault_admins.id != ""
     error_message = "LDAP2 vault-admins group should be created"
   }
 
   assert {
-    condition     = vault_identity_group.ldap1_developers.id != ""
+    condition     = vault_identity_group.developers.id != ""
     error_message = "LDAP1 developers group should be created"
   }
 
   assert {
-    condition     = vault_identity_group.ldap2_developers.id != ""
+    condition     = vault_identity_group.developers.id != ""
     error_message = "LDAP2 developers group should be created"
   }
 }
@@ -98,22 +98,22 @@ run "test_group_aliases_linked" {
   command = apply
 
   assert {
-    condition     = vault_identity_group_alias.ldap1_vault_admins_alias.id != ""
+    condition     = vault_identity_group_alias.vault_admins_alias.id != ""
     error_message = "LDAP1 vault-admins group alias should be created"
   }
 
   assert {
-    condition     = vault_identity_group_alias.ldap2_vault_admins_alias.id != ""
+    condition     = vault_identity_group_alias.vault_admins_alias.id != ""
     error_message = "LDAP2 vault-admins group alias should be created"
   }
 
   assert {
-    condition     = vault_identity_group_alias.ldap1_developers_alias.id != ""
+    condition     = vault_identity_group_alias.developers_alias.id != ""
     error_message = "LDAP1 developers group alias should be created"
   }
 
   assert {
-    condition     = vault_identity_group_alias.ldap2_developers_alias.id != ""
+    condition     = vault_identity_group_alias.developers_alias.id != ""
     error_message = "LDAP2 developers group alias should be created"
   }
 }
@@ -123,18 +123,18 @@ run "test_entity_aliases_created" {
   command = apply
 
   assert {
-    condition     = vault_identity_entity_alias.ldap1_bob.id != ""
+    condition     = vault_identity_entity_alias.bob.id != ""
     error_message = "Bob's LDAP1 entity alias should be created"
   }
 
   assert {
-    condition     = vault_identity_entity_alias.ldap2_bob.id != ""
+    condition     = vault_identity_entity_alias.bob.id != ""
     error_message = "Bob's LDAP2 entity alias should be created"
   }
 
   # Both aliases should reference the same entity
   assert {
-    condition     = vault_identity_entity_alias.ldap1_bob.canonical_id == vault_identity_entity_alias.ldap2_bob.canonical_id
+    condition     = vault_identity_entity_alias.bob.canonical_id == vault_identity_entity_alias.bob.canonical_id
     error_message = "Both Bob's aliases should reference the same entity for cross-backend identity"
   }
 }

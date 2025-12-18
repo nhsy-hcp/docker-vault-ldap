@@ -133,23 +133,23 @@ run "test_policy_assignments_to_groups" {
 
   # Vault-admins groups should have vault-admins policy
   assert {
-    condition     = contains(vault_identity_group.ldap1_vault_admins.policies, vault_policy.vault_admins.name)
+    condition     = contains(vault_identity_group.vault_admins.policies, vault_policy.vault_admins.name)
     error_message = "LDAP1 vault-admins group should have vault-admins policy"
   }
 
   assert {
-    condition     = contains(vault_identity_group.ldap2_vault_admins.policies, vault_policy.vault_admins.name)
+    condition     = contains(vault_identity_group.vault_admins.policies, vault_policy.vault_admins.name)
     error_message = "LDAP2 vault-admins group should have vault-admins policy"
   }
 
   # Developers groups should have app-secrets policy
   assert {
-    condition     = contains(vault_identity_group.ldap1_developers.policies, vault_policy.app_secrets.name)
+    condition     = contains(vault_identity_group.developers.policies, vault_policy.app_secrets.name)
     error_message = "LDAP1 developers group should have app-secrets policy"
   }
 
   assert {
-    condition     = contains(vault_identity_group.ldap2_developers.policies, vault_policy.app_secrets.name)
+    condition     = contains(vault_identity_group.developers.policies, vault_policy.app_secrets.name)
     error_message = "LDAP2 developers group should have app-secrets policy"
   }
 }
@@ -193,18 +193,18 @@ run "test_access_control_separation" {
 
   # Ensure different groups exist for different access levels
   assert {
-    condition     = vault_identity_group.ldap1_vault_admins.name != vault_identity_group.ldap1_developers.name
+    condition     = vault_identity_group.vault_admins.name != vault_identity_group.developers.name
     error_message = "Vault-admins and developers groups should be separate"
   }
 
   # Ensure policy assignments are distinct
   assert {
-    condition     = !contains(vault_identity_group.ldap1_developers.policies, vault_policy.vault_admins.name)
+    condition     = !contains(vault_identity_group.developers.policies, vault_policy.vault_admins.name)
     error_message = "Developers group should not have vault-admins policy"
   }
 
   assert {
-    condition     = !contains(vault_identity_group.ldap1_vault_admins.policies, vault_policy.app_secrets.name)
+    condition     = !contains(vault_identity_group.vault_admins.policies, vault_policy.app_secrets.name)
     error_message = "Vault-admins group should not need app-secrets policy (has broader access)"
   }
 }
