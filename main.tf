@@ -145,3 +145,48 @@ resource "vault_kv_secret_v2" "restricted_db" {
     password = "w1bble"
   })
 }
+
+# Secret engine
+resource "vault_ldap_secret_backend" "config" {
+  binddn            = "cn=admin,dc=example,dc=com"
+  bindpass          = "admin"
+  url               = "ldap://ldap:389"
+  insecure_tls      = "true"
+  skip_static_role_import_rotation = true
+}
+
+resource "vault_ldap_secret_backend_static_role" "alice_static" {
+  mount           = vault_ldap_secret_backend.config.path
+  username        = "alice"
+  dn              = "cn=alice,ou=users,dc=example,dc=com"
+  role_name       = "alice"
+  rotation_period = 60
+  skip_import_rotation = true
+}
+
+resource "vault_ldap_secret_backend_dynamic_role" "developer_dynamic" {
+  mount         = vault_ldap_secret_backend.config.path
+  role_name     = "developer"
+  username_template = "{{.RoleName}}_{{random 10}}"
+  creation_ldif = <<EOT
+dn: cn={{.Username}},ou=users,dc=example,dc=com
+changetype: add
+objectClass: person
+sn: {{random 20}}
+cn: {{.Username}}
+
+dn: cn=developers,ou=groups,dc=example,dc=com
+changetype: modify
+add: member
+member: cn={{.Username}},ou=users,dc=example,dc=com
+-
+EOT
+  deletion_ldif = <<EOT
+dn: cn={{.Username}},ou=users,dc=learn,dc=example
+changetype: delete
+EOT
+  rollback_ldif = <<EOT
+dn: cn={{.Username}},ou=users,dc=learn,dc=example
+changetype: delete
+EOT
+}
