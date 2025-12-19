@@ -6,7 +6,7 @@ This directory contains comprehensive Terraform tests for the Vault LDAP authent
 
 ### Unit Tests (Plan-based validation)
 - **`vault_config_validation.tftest.hcl`** - Validates Vault provider configuration, audit settings, and basic resource attributes
-- **`ldap_backends_validation.tftest.hcl`** - Tests LDAP authentication backend configurations (ldap1, ldap2)
+- **`ldap_backends_validation.tftest.hcl`** - Tests LDAP authentication backend configuration
 - **`policies_validation.tftest.hcl`** - Validates policy content and structure
 - **`identity_mapping_validation.tftest.hcl`** - Tests identity groups, entities, and aliases configuration
 
@@ -77,9 +77,9 @@ terraform test -verbose -filter=tests/vault_config_validation.tftest.hcl
 - Test secret data integrity
 
 ### 2. LDAP Backend Tests
-- Validate LDAP1 and LDAP2 backend configurations
+- Validate LDAP backend configuration
 - Test token TTL settings
-- Verify backend consistency and isolation
+- Verify backend consistency
 - Check LDAP connection parameters
 
 ### 3. Policy Tests
@@ -89,10 +89,10 @@ terraform test -verbose -filter=tests/vault_config_validation.tftest.hcl
 - Check policy assignment to groups
 
 ### 4. Identity Mapping Tests
-- Test identity groups for both LDAP backends
+- Test identity groups for LDAP backend
 - Validate group aliases and their mappings
 - Check entity and entity alias configurations
-- Verify cross-backend identity consistency
+- Verify identity consistency
 
 ### 5. Integration Tests
 - End-to-end infrastructure deployment
@@ -103,11 +103,11 @@ terraform test -verbose -filter=tests/vault_config_validation.tftest.hcl
 ## Key Test Scenarios
 
 1. **Configuration Validation**: Verify all resources are properly configured with correct attributes
-2. **LDAP Backend Testing**: Validate both ldap1 and ldap2 backends with proper settings
-3. **Policy Enforcement**: Test vault-admins vs app-secrets policy access patterns  
-4. **Identity Mapping**: Verify user entities can authenticate via multiple LDAP backends
+2. **LDAP Backend Testing**: Validate LDAP backend with proper settings
+3. **Policy Enforcement**: Test vault-admins vs app-secrets policy access patterns
+4. **Identity Mapping**: Verify user entities can authenticate via LDAP backend
 5. **Secret Access Control**: Validate tiered access to `secret/app/*` vs `secret/restricted/*`
-6. **Cross-Backend Identity**: Test that user 'bob' maintains consistent identity across ldap1/ldap2
+6. **Identity Consistency**: Test that user 'bob' maintains consistent identity
 
 ## Test Data
 

@@ -63,12 +63,7 @@ output "app_secrets_policy_name" {
   value       = "app-secrets"
 }
 
-output "ldap1_backend_path" {
-  description = "LDAP1 backend mount path"
-  value       = "ldap1"
-}
-
-output "ldap2_backend_path" {
-  description = "LDAP2 backend mount path"
-  value       = "ldap2"
+output "ldap_backend_path" {
+  description = "LDAP backend mount path"
+  value       = "ldap"
 }

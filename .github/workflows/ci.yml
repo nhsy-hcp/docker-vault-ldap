@@ -33,35 +33,20 @@ jobs:
         with:
           terraform_version: "1.14.2"
 
-      - name: terraform linting
+      - name: install go-task
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: linting
         run: terraform fmt -check -recursive
 
-      - name: start services
-        run: |
-          docker compose up -d
-          docker compose ps
-          sleep 10
+      - name: download docker container images
+        run: docker compose pull
 
-      - name: check vault status
-        run: vault status
+      - name: run terraform tests
+        run: task test:terraform
 
-      - name: terraform apply
-        run: |
-          terraform init
-          terraform apply -auto-approve
-          sleep 30
-
-      - name: configure ldap data
-        run: |
-          docker compose cp ./files/ldap-example.ldif ldap:/tmp/ldap-example.ldif
-          docker compose exec -T ldap ldapadd -cx -D "cn=admin,dc=example,dc=com" -w admin -f /tmp/ldap-example.ldif || true
-
-      - name: run tests
-        run: |
-          echo "fetching dynamic creds for developer role"
-          vault read ldap/creds/developer
-          echo "current creds for static role"
-          vault read ldap/static-cred/alice
-          vault write -f ldap/rotate-role/alice
-          echo "alice credentials rotated successfully"
-          vault read ldap/static-cred/alice
+      - name: run smoke tests
+        run: task test:smoke

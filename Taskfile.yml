@@ -43,7 +43,6 @@ tasks:
   status:
     cmds:
       - vault status
-    ignore_error: true
 
   backup:
     cmds:
@@ -89,9 +88,9 @@ tasks:
 
   post-install:
     cmds:
+      - task: ldap-config
       - terraform init
       - terraform apply -auto-approve
-      - task: ldap-config
 
   rotate-alice:
     desc: rotate alice ldap credentials via static role
@@ -105,10 +104,32 @@ tasks:
     cmds:
       - vault read ldap/creds/developer
 
-  test:
+  test:secrets:
+    desc: run validation tests for ldap integration
     cmds:
-      - task: clean
-      - sleep 5
+      - echo "fetching dynamic creds for developer role"
+      - vault read ldap/creds/developer
+      - echo "current creds for static role"
+      - vault read ldap/static-cred/alice
+      - vault write -f ldap/rotate-role/alice
+      - echo "alice credentials rotated successfully"
+      - vault read ldap/static-cred/alice
+
+  test:terraform:
+    desc: run terraform native tests
+    cmds:
       - task: up
-      - sleep 5
+      - sleep 10
+      - task: status
+      - task: ldap-config
+      - terraform init
+      - sleep 10
       - terraform test
+      - task: clean
+
+  test:smoke:
+    desc: run smoke tests
+    cmds:
+      - task: all
+      - sleep 10
+      - task: test:secrets
