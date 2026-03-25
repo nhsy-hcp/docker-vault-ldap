@@ -17,6 +17,7 @@ This repository demonstrates HashiCorp Vault LDAP authentication integration usi
 - Sample users: `bob` (vault-admins group), `alice` (developers group)
 - LDAP secret engine configured with static role for `alice` with automatic rotation
 - LDAP secret engine configured with dynamic role for temporary `developers` group members
+- LDAP secret engine configured with library set for shared `app123` service accounts
 
 ## Pre-requisites
 Install `taskfile` and `jq` with the following command:
@@ -45,6 +46,7 @@ git clone https://github.com/nhsy-hcp/docker-vault-ldap.git
    - Initialize Terraform and apply Vault configuration
    - Configure LDAP authentication backends
    - Create sample users and policies
+   - Print access URLs, login info, and example commands (via `task output`)
 
 2. **Set environment variables:**
    ```shell
@@ -64,6 +66,9 @@ git clone https://github.com/nhsy-hcp/docker-vault-ldap.git
 # View service status
 task status
 
+# Display access URLs, admin credentials, and example commands
+task output
+
 # View logs
 task logs
 task logs-vault
@@ -73,6 +78,19 @@ task stop
 
 # Clean up and rebuild
 task clean all
+```
+
+## Fetching LDAP Credentials
+
+```bash
+# Static credentials (alice) - password managed and rotated by Vault
+task cred:ldap-static
+
+# Dynamic credentials (developer role) - ephemeral user created on demand
+task cred:ldap-dynamic
+
+# Library credentials (app123) - check out a shared service account
+task cred:ldap-library
 ```
 
 ## Testing LDAP Authentication
