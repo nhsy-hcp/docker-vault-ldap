@@ -12,6 +12,7 @@ tasks:
       - task: status
       - sleep 5
       - task: post-install
+      - task: output
 
   up:
     preconditions:
@@ -104,13 +105,50 @@ tasks:
     cmds:
       - vault read ldap/creds/developer
 
+  output:
+    desc: display access URLs, admin credentials, and example credential commands
+    silent: true
+    cmds:
+      - |
+        echo ""
+        echo "===== Access URLs ====="
+        echo "Vault UI:       http://localhost:8200"
+        echo "PHPLDAPAdmin:   https://localhost:6443"
+        echo ""
+        echo "===== Vault Admin ====="
+        echo "Token: root"
+        echo ""
+        echo "===== PHPLDAPAdmin Login ====="
+        echo "Bind DN:  cn=admin,dc=example,dc=com"
+        echo "Password: admin"
+        echo ""
+        echo "===== Example Credential Commands ====="
+        echo "Static  (alice):     task cred:ldap-static"
+        echo "Dynamic (developer): task cred:ldap-dynamic"
+        echo "Library (app123):    task cred:ldap-library"
+
+  cred:ldap-static:
+    desc: fetch static ldap credentials for alice
+    cmds:
+      - vault read ldap/static-cred/alice
+
+  cred:ldap-dynamic:
+    desc: fetch dynamic ldap credentials for developer role
+    cmds:
+      - vault read ldap/creds/developer
+
+  cred:ldap-library:
+    desc: check out a credential from the app123 library set
+    cmds:
+      - vault write -f ldap/library/app123/check-out
+
   test:secrets:
     desc: run validation tests for ldap integration
     cmds:
       - echo "fetching dynamic creds for developer role"
-      - vault read ldap/creds/developer
+      - task cred:ldap-dynamic
       - echo "current creds for static role"
-      - vault read ldap/static-cred/alice
+      - task cred:ldap-static
       - vault write -f ldap/rotate-role/alice
       - echo "alice credentials rotated successfully"
       - vault read ldap/static-cred/alice
