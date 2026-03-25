@@ -10,31 +10,63 @@ objectClass: top
 ou: users
 description: users
 
-dn: cn=developers,ou=groups,dc=example,dc=com
-objectClass: groupofnames
-objectClass: top
-description: testing group for developers
-cn: developers
-member: cn=alice,ou=users,dc=example,dc=com
-
-dn: cn=vault-admins,ou=groups,dc=example,dc=com
-objectClass: groupofnames
-objectClass: top
-description: vault admins group
-cn: vault-admins
-member: cn=bob,ou=users,dc=example,dc=com
-
 dn: cn=alice,ou=users,dc=example,dc=com
-objectClass: person
 objectClass: top
+objectClass: person
 cn: alice
 sn: alice
-memberOf: cn=developers,ou=groups,dc=example,dc=com
 userPassword: password
 
 dn: cn=bob,ou=users,dc=example,dc=com
-objectClass: person
 objectClass: top
+objectClass: person
 cn: bob
 sn: bob
 userPassword: password
+
+dn: cn=developers,ou=groups,dc=example,dc=com
+objectClass: groupOfNames
+objectClass: top
+cn: developers
+description: testing group for developers
+member: cn=alice,ou=users,dc=example,dc=com
+
+dn: cn=vault-admins,ou=groups,dc=example,dc=com
+objectClass: groupOfNames
+objectClass: top
+cn: vault-admins
+description: vault admins group
+member: cn=bob,ou=users,dc=example,dc=com
+
+dn: cn=app123-user1,ou=users,dc=example,dc=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: app123-user1
+sn: User1
+
+dn: cn=app123-user2,ou=users,dc=example,dc=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: app123-user2
+sn: User2
+
+dn: cn=app123-user3,ou=users,dc=example,dc=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: app123-user3
+sn: User3
+
+dn: cn=app123,ou=groups,dc=example,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: app123
+description: testing group for vault libraries
+member: cn=app123-user1,ou=users,dc=example,dc=com
+member: cn=app123-user2,ou=users,dc=example,dc=com
+member: cn=app123-user3,ou=users,dc=example,dc=com
