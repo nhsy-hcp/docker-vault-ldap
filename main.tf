@@ -102,6 +102,7 @@ resource "vault_kv_secret_v2" "restricted_db" {
 
 # Secret engine
 resource "vault_ldap_secret_backend" "config" {
+  userdn                           = "ou=users,dc=example,dc=com"
   binddn                           = "cn=admin,dc=example,dc=com"
   bindpass                         = "admin"
   url                              = "ldap://ldap:389"
@@ -145,4 +146,12 @@ EOT
 dn: cn={{.Username}},ou=users,dc=example,dc=com
 changetype: delete
 EOT
+}
+
+resource "vault_ldap_secret_backend_library_set" "app123_library" {
+  mount                 = vault_ldap_secret_backend.config.path
+  name                  = "app123"
+  service_account_names = ["app123-user1", "app123-user2", "app123-user3"]
+  ttl                   = 60
+  max_ttl               = 120
 }
